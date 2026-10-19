@@ -157,6 +157,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
           <PhotoFrame
             item={getItem('opening-yacht-proposal')}
             aspectRatioClass={HERO_LANDSCAPE_ASPECT}
+            objectPosition="center 0%"
             priority={true}
           />
         </div>
@@ -213,7 +214,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             <PhotoFrame
               item={getItem('cluster2-bw-celebration')}
               aspectRatioClass={HERO_LANDSCAPE_ASPECT}
-              objectPosition="center 28%"
+              objectPosition="center 5%"
             />
           </div>
 
@@ -376,6 +377,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
               <PhotoFrame
                 item={getItem('chA-ceremonial-gathering')}
                 aspectRatioClass={LANDSCAPE_ASPECT}
+                objectPosition="center 4%"
               />
             </div>
             {/* Desktop & Tablet: Image 10 in right 4-column span */}
@@ -651,7 +653,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
                 <PhotoFrame
                   item={getItem('chD-final-vow')}
                   aspectRatioClass={LANDSCAPE_ASPECT}
-                  objectPosition="center 30%"
+                  objectPosition="center 4%"
                 />
               </div>
             </div>
@@ -660,7 +662,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
               <PhotoFrame
                 item={getItem('chD-final-vow')}
                 aspectRatioClass={LANDSCAPE_ASPECT}
-                objectPosition="center 30%"
+                objectPosition="center 4%"
               />
             </div>
           </div>

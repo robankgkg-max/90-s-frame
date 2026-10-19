@@ -28,7 +28,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     subtitle: 'Golden hour maritime proposal framed by white florals on the Arabian Gulf',
     location: 'Dubai Marina & Arabian Gulf',
     filmStock: 'Medium Format Digital Cinema',
-    objectPosition: 'center 40%',
+    objectPosition: 'center 0%',
   },
   {
     id: 'cluster1-skyline-bride',
@@ -76,7 +76,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     subtitle: 'Monochrome joy as petals fall in the cathedral courtyard',
     location: 'Historic Courtyard Recessional',
     filmStock: '35mm Tri-X 400 Black & White',
-    objectPosition: 'center 30%',
+    objectPosition: 'center 5%',
   },
   {
     id: 'cluster2-candid-sunlight-couple',
@@ -117,7 +117,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     subtitle: 'Generations united in shared reverie and joyous applause',
     location: 'Royal Pavilions, Rajasthan',
     filmStock: 'Medium Format Hasselblad',
-    objectPosition: 'center 35%',
+    objectPosition: 'center 4%',
   },
   {
     id: 'chA-bridal-intimacy',
@@ -324,7 +324,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     subtitle: 'A quiet seal upon memories that will never fade',
     location: 'Ceremonial Pavilion',
     filmStock: 'Kodak Portra 400',
-    objectPosition: 'center 30%',
+    objectPosition: 'center 4%',
   },
 
   // -------------------------------------------------------------
