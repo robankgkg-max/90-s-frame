@@ -142,12 +142,14 @@ interface CRTTelevisionProps {
   reel: VideoReel;
   isActive: boolean;
   onPlayStart: () => void;
+  screenAspectClass?: string;
 }
 
 export const CRTTelevision: React.FC<CRTTelevisionProps> = ({
   reel,
   isActive,
   onPlayStart,
+  screenAspectClass = 'aspect-[4/3] xs:aspect-[16/10] sm:aspect-[4/3] lg:aspect-[5/3]',
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -500,7 +502,7 @@ export const CRTTelevision: React.FC<CRTTelevisionProps> = ({
       {/* Main Television Body: CRT Curved Screen Frame (Preserved 100% exactly as it is) */}
       <div className="mt-2.5 sm:mt-3 relative w-full">
         {/* Deep Recessed CRT Screen Bezel */}
-        <div className="relative w-full aspect-[4/3] xs:aspect-[16/10] sm:aspect-[4/3] bg-[#080807] rounded-xl sm:rounded-2xl overflow-hidden p-1 sm:p-2 border-2 border-black/80 shadow-[inset_0_5px_15px_rgba(0,0,0,0.95),0_4px_12px_rgba(0,0,0,0.5)]">
+        <div className={`relative w-full ${screenAspectClass} bg-[#080807] rounded-xl sm:rounded-2xl overflow-hidden p-1 sm:p-2 border-2 border-black/80 shadow-[inset_0_5px_15px_rgba(0,0,0,0.95),0_4px_12px_rgba(0,0,0,0.5)]`}>
           {/* The Actual Curved Glass Tube Container */}
           <div
             onClick={togglePlay}
@@ -822,6 +824,7 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
               reel={reel01}
               isActive={activeReelId === reel01.id}
               onPlayStart={() => handlePlayStart(reel01.id)}
+              screenAspectClass="aspect-[4/3] xs:aspect-[16/10] sm:aspect-[4/3] lg:aspect-[5/3]"
             />
           </div>
 
@@ -891,6 +894,7 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
                 reel={reel02}
                 isActive={activeReelId === reel02.id}
                 onPlayStart={() => handlePlayStart(reel02.id)}
+                screenAspectClass="aspect-[4/3] xs:aspect-[16/10] sm:aspect-[4/3] lg:aspect-[5/3]"
               />
 
               {/* Editorial Metadata Card for Television 02 */}
@@ -941,6 +945,7 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
               reel={reel03}
               isActive={activeReelId === reel03.id}
               onPlayStart={() => handlePlayStart(reel03.id)}
+              screenAspectClass="aspect-[4/3] xs:aspect-[16/10] sm:aspect-[4/3] lg:aspect-[5/3]"
             />
 
             {/* Editorial Metadata Card for Television 03 */}

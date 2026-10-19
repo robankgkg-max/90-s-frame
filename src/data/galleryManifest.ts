@@ -88,7 +88,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     subtitle: 'Spontaneous laughter under golden olive grove branches',
     location: 'Tuscan Estate Pathway',
     filmStock: 'Contax 645 & Kodak Portra 800',
-    objectPosition: 'center 25%',
+    objectPosition: 'center 30%',
   },
 
   // -------------------------------------------------------------
@@ -105,7 +105,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     subtitle: 'Ancient vows exchanged amid whispers of temple bells and sandalwood',
     location: 'Palace Mandap, Udaipur',
     filmStock: '35mm Kodak Vision3 250D',
-    objectPosition: 'center 30%',
+    objectPosition: 'center 42%',
   },
   {
     id: 'chA-ceremonial-gathering',

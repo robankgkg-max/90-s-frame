@@ -27,6 +27,12 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
   const PORTRAIT_ASPECT = 'aspect-[9/13.5]';
   const LANDSCAPE_ASPECT = 'aspect-[16/10]';
   const HERO_LANDSCAPE_ASPECT = 'aspect-[16/8.6]';
+  // Frames 6 & 7 Aspect Standard (Plan A):
+  // - Mobile & Tablet (< lg): Restored exact vertical images (PORTRAIT_ASPECT 'aspect-[9/13.5]'), completely untouched.
+  // - Desktop (lg+): Plan A — true vertical portrait with controlled height (min-h 500px, max-h 580px-620px)
+  //   so it fits cleanly on Mac screens without overflowing the viewport.
+  const FRAMES_6_7_ASPECT =
+    'aspect-[9/13.5] lg:min-h-[500px] lg:max-h-[580px] xl:max-h-[620px]';
 
   // Reusable frame component for consistent editorial styling & zero CLS
   const PhotoFrame: React.FC<{
@@ -38,10 +44,11 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
   }> = ({
     item,
     aspectRatioClass = PORTRAIT_ASPECT,
-    objectPosition = 'center center',
+    objectPosition,
     priority = false,
     className = '',
   }) => {
+    const resolvedPosition = objectPosition || item.objectPosition || 'center center';
     return (
       <div className={`flex flex-col group select-none ${className}`}>
         <div
@@ -53,7 +60,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             alt={item.alt}
             loading={priority ? 'eager' : 'lazy'}
             referrerPolicy="no-referrer"
-            style={{ objectPosition: item.objectPosition || objectPosition }}
+            style={{ objectPosition: resolvedPosition }}
             className="w-full h-full object-cover group-hover:scale-[1.015] transition-transform duration-700 ease-out will-change-transform"
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-white/[0.03] transition-colors duration-500 pointer-events-none" />
@@ -77,6 +84,10 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
     spaceClassName?: string;
     paddingClassName?: string;
     aspectRatioClass?: string;
+    subtitle?: string;
+    subtitleClassName?: string;
+    eyebrow?: string;
+    eyebrowClassName?: string;
   }> = ({
     lines,
     className = '',
@@ -84,11 +95,16 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
     spaceClassName = 'space-y-1 xs:space-y-1.5 sm:space-y-2',
     paddingClassName = 'p-3.5 xs:p-5 sm:p-8 md:p-10',
     aspectRatioClass = 'aspect-square',
+    subtitle,
+    subtitleClassName = 'font-editorial italic font-normal text-xs sm:text-sm lg:text-base text-[#D5CEC2]/75 mt-3 sm:mt-4 tracking-[0.02em]',
+    eyebrow,
+    eyebrowClassName = 'text-[8px] xs:text-[9px] sm:text-[10px] uppercase tracking-[0.22em] text-[#D5CEC2]/60 mb-2 sm:mb-3',
   }) => {
     return (
       <div
         className={`w-full ${aspectRatioClass} bg-[#11100E] flex flex-col items-center justify-center ${paddingClassName} select-none text-center ${className}`}
       >
+        {eyebrow && <p className={eyebrowClassName}>{eyebrow}</p>}
         <div className={spaceClassName}>
           {lines.map((line, idx) => (
             <p
@@ -99,6 +115,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             </p>
           ))}
         </div>
+        {subtitle && <p className={subtitleClassName}>{subtitle}</p>}
       </div>
     );
   };
@@ -152,7 +169,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             Tablet/Desktop (3-column asymmetric):
               Col 1: Modern Bride | Col 2: Traditional Bride | Col 3: Text Panel + Detail
         ------------------------------------------------------------- */}
-        <div className="grid grid-cols-2 md:grid-cols-12 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 mb-3.5 xs:mb-4 sm:mb-16 md:mb-20 items-start">
+        <div className="grid grid-cols-2 md:grid-cols-12 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 mb-3.5 xs:mb-4 sm:mb-7 md:mb-7 lg:mb-8 items-start">
           {/* Left: Modern Bride */}
           <div className="col-span-1 md:col-span-4">
             <PhotoFrame
@@ -190,7 +207,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             Row 1: Frame 5: Black & White Celebration (Full-width hero landscape)
             Row 2: Frames 6 & 7: Candid Couple & Traditional Ceremony (Two vertical frames in a row under the 5th frame)
         ------------------------------------------------------------- */}
-        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-6 md:space-y-7 lg:space-y-8 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-28">
+        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-6 md:space-y-7 lg:space-y-8 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-0">
           {/* Frame 5: Black & White Celebration */}
           <div className="w-full">
             <PhotoFrame
@@ -200,21 +217,48 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             />
           </div>
 
-          {/* Frames 6 & 7: Two vertical frames in a row under the fifth frame */}
-          <div className="grid grid-cols-2 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start">
-            <div className="col-span-1">
-              <PhotoFrame
-                item={getItem('cluster2-candid-sunlight-couple')}
-                aspectRatioClass={PORTRAIT_ASPECT}
-                objectPosition="center 22%"
-              />
+          {/* Frames 6 & 7 (Left side) & Poetic Words Panel (Right side)
+              - Mobile & Tablet (< lg): Restored exact vertical images in 2-column grid untouched
+              - Desktop (lg+): Two vertical frames on left (8 cols) and poetic words panel on right (4 cols) */}
+          <div className="grid grid-cols-2 lg:grid-cols-12 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start w-full">
+            {/* Left Side (Desktop: 8 cols, Mobile/Tablet: 2 cols): Two Vertical Frames */}
+            <div className="col-span-2 lg:col-span-8 grid grid-cols-2 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start">
+              <div className="col-span-1">
+                <PhotoFrame
+                  item={getItem('cluster2-candid-sunlight-couple')}
+                  aspectRatioClass={FRAMES_6_7_ASPECT}
+                  objectPosition="center 30%"
+                />
+              </div>
+              <div className="col-span-1">
+                <PhotoFrame
+                  item={getItem('chA-traditional-ceremony')}
+                  aspectRatioClass={FRAMES_6_7_ASPECT}
+                  objectPosition="center 42%"
+                />
+              </div>
             </div>
-            <div className="col-span-1">
-              <PhotoFrame
-                item={getItem('chA-traditional-ceremony')}
-                aspectRatioClass={PORTRAIT_ASPECT}
-                objectPosition="center 30%"
+
+            {/* Right Side (Desktop: 4 cols): Poetic Editorial Words Panel */}
+            <div className="hidden lg:flex lg:col-span-4 flex-col select-none">
+              <EditorialTextPanel
+                lines={[
+                  'SOME THINGS',
+                  'STAY WITH US',
+                  'AS IT FELT',
+                ]}
+                aspectRatioClass={FRAMES_6_7_ASPECT}
+                paddingClassName="p-4 lg:p-8 xl:p-12"
+                textClassName="text-xl sm:text-2xl md:text-3xl lg:text-[26px] xl:text-[32px] 2xl:text-[36px] leading-[1.12] tracking-[0.05em]"
+                spaceClassName="space-y-2 lg:space-y-3 xl:space-y-4"
+                subtitle="Untouched by time, held forever in the quiet light."
+                subtitleClassName="font-editorial italic font-normal text-xs lg:text-[13px] xl:text-sm text-[#D5CEC2]/75 mt-4 lg:mt-6 tracking-[0.02em] max-w-[260px] leading-relaxed"
               />
+              <div className="mt-2 sm:mt-2.5 md:mt-3.5">
+                <p className="text-[8px] xs:text-[8.5px] sm:text-[9.5px] md:text-[10px] uppercase tracking-[0.18em] xs:tracking-[0.2em] sm:tracking-[0.24em] font-medium text-[#D5CEC2] leading-tight">
+                  UNSCRIPTED MEMORY
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -228,10 +272,18 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             EXTENDED CHAPTER A: THE TRADITION AND CELEBRATION SEQUENCE
             Text Panel: IN THAT MOMENT EVERY BLESSING BECAME OUR OWN
         ------------------------------------------------------------- */}
-        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-7 md:space-y-7 lg:space-y-16 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-28 pt-3.5 xs:pt-4 sm:pt-[14px] md:pt-[14px] lg:pt-8 border-t border-[#302B25]/40">
-          {/* Row 1: Editorial Verse Panel & Bridal Intimacy (Image 8) */}
-          <div className="grid grid-cols-2 md:grid-cols-12 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start">
-            <div className="col-span-1 md:col-span-6">
+        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-7 md:space-y-7 lg:space-y-8 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-0 pt-3.5 xs:pt-4 sm:pt-[14px] md:pt-[14px] lg:pt-8 border-t border-[#302B25]/40">
+          {/* Row 1: Editorial Verse Panel & Bridal Intimacy (Image 8)
+              - Mobile & Tablet (< lg): 100% untouched original 2-column diptych (Text on left, Image 8 on right)
+              - Desktop (lg+): Balanced 3-column triptych:
+                  * Left (4 cols): 'IN THAT MOMENT, EVERY' + poetic lead-in verse
+                  * Center (4 cols): Image 8 (Bridal Intimacy) with controlled vertical frame height
+                  * Right (4 cols): 'BLESSING BECAME OUR OWN.' + 'The sacred cadence of tradition, woven into a quiet promise.'
+          */}
+
+          {/* --- MOBILE & TABLET (< lg): Untouched 2-column layout --- */}
+          <div className="grid grid-cols-2 md:grid-cols-12 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 items-start lg:hidden">
+            <div className="col-span-1 md:col-span-6 flex flex-col select-none">
               <EditorialTextPanel
                 lines={[
                   'IN THAT',
@@ -242,9 +294,11 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
                   'OUR OWN',
                 ]}
                 aspectRatioClass={PORTRAIT_ASPECT}
-                paddingClassName="p-2.5 xs:p-3 sm:p-5 md:p-6 lg:p-8 xl:p-10"
-                textClassName="text-[19px] xs:text-[23px] sm:text-[31px] md:text-[38px] lg:text-[48px] xl:text-[56px] leading-[1.08] sm:leading-[1.10] md:leading-[1.12] tracking-[0.04em] sm:tracking-[0.05em] md:tracking-[0.06em]"
-                spaceClassName="space-y-1.5 xs:space-y-2 sm:space-y-3 md:space-y-4 lg:space-y-5 xl:space-y-6"
+                paddingClassName="p-2.5 xs:p-3 sm:p-5 md:p-6"
+                textClassName="text-[19px] xs:text-[23px] sm:text-[31px] md:text-[38px] leading-[1.10] tracking-[0.05em]"
+                spaceClassName="space-y-1.5 xs:space-y-2 sm:space-y-3 md:space-y-4"
+                subtitle="The sacred cadence of tradition, woven into a quiet promise."
+                subtitleClassName="font-editorial italic font-normal text-xs sm:text-[13px] text-[#D5CEC2]/75 mt-3 sm:mt-4 tracking-[0.02em] max-w-[240px] leading-relaxed hidden sm:block"
               />
             </div>
             <div className="col-span-1 md:col-span-6">
@@ -253,6 +307,66 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
                 aspectRatioClass={PORTRAIT_ASPECT}
                 objectPosition="center 20%"
               />
+            </div>
+          </div>
+
+          {/* --- DESKTOP (lg+): 3-Column Editorial Triptych --- */}
+          <div className="hidden lg:grid lg:grid-cols-12 lg:gap-8 items-start w-full">
+            {/* Left Panel (Cols 1-4): 'IN THAT MOMENT, EVERY' */}
+            <div className="lg:col-span-4 flex flex-col select-none">
+              <EditorialTextPanel
+                eyebrow="CHAPTER A // 01"
+                eyebrowClassName="text-[9px] xl:text-[10px] uppercase tracking-[0.24em] text-[#D5CEC2]/60 mb-3 xl:mb-4"
+                lines={[
+                  'IN THAT',
+                  'MOMENT,',
+                  'EVERY',
+                ]}
+                aspectRatioClass={FRAMES_6_7_ASPECT}
+                paddingClassName="p-6 lg:p-8 xl:p-12"
+                textClassName="text-2xl lg:text-[28px] xl:text-[34px] 2xl:text-[38px] leading-[1.12] tracking-[0.05em]"
+                spaceClassName="space-y-2 lg:space-y-3 xl:space-y-4"
+                subtitle="The sacred cadence of tradition..."
+                subtitleClassName="font-editorial italic font-normal text-xs lg:text-[13px] xl:text-sm text-[#D5CEC2]/75 mt-4 lg:mt-6 tracking-[0.02em] max-w-[240px] leading-relaxed text-center"
+              />
+              <div className="mt-2 sm:mt-2.5 md:mt-3.5">
+                <p className="text-[8px] xs:text-[8.5px] sm:text-[9.5px] md:text-[10px] uppercase tracking-[0.18em] xs:tracking-[0.2em] sm:tracking-[0.24em] font-medium text-[#D5CEC2] leading-tight">
+                  CHAPTER A // INCEPTION
+                </p>
+              </div>
+            </div>
+
+            {/* Center Panel (Cols 5-8): Image 8 (The Bridal Heirloom) */}
+            <div className="lg:col-span-4">
+              <PhotoFrame
+                item={getItem('chA-bridal-intimacy')}
+                aspectRatioClass={FRAMES_6_7_ASPECT}
+                objectPosition="center 20%"
+              />
+            </div>
+
+            {/* Right Panel (Cols 9-12): 'BLESSING BECAME OUR OWN.' + Poetic Resolution */}
+            <div className="lg:col-span-4 flex flex-col select-none">
+              <EditorialTextPanel
+                eyebrow="CHAPTER A // 02"
+                eyebrowClassName="text-[9px] xl:text-[10px] uppercase tracking-[0.24em] text-[#D5CEC2]/60 mb-3 xl:mb-4"
+                lines={[
+                  'BLESSING',
+                  'BECAME',
+                  'OUR OWN.',
+                ]}
+                aspectRatioClass={FRAMES_6_7_ASPECT}
+                paddingClassName="p-6 lg:p-8 xl:p-12"
+                textClassName="text-2xl lg:text-[28px] xl:text-[34px] 2xl:text-[38px] leading-[1.12] tracking-[0.05em]"
+                spaceClassName="space-y-2 lg:space-y-3 xl:space-y-4"
+                subtitle="...woven into a quiet promise."
+                subtitleClassName="font-editorial italic font-normal text-xs lg:text-[13px] xl:text-sm text-[#D5CEC2]/75 mt-4 lg:mt-6 tracking-[0.02em] max-w-[240px] leading-relaxed text-center"
+              />
+              <div className="mt-2 sm:mt-2.5 md:mt-3.5">
+                <p className="text-[8px] xs:text-[8.5px] sm:text-[9.5px] md:text-[10px] uppercase tracking-[0.18em] xs:tracking-[0.2em] sm:tracking-[0.24em] font-medium text-[#D5CEC2] leading-tight">
+                  CHAPTER A // SACRED UNION
+                </p>
+              </div>
             </div>
           </div>
 
@@ -296,7 +410,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             EXTENDED CHAPTER B: INTIMATE MOMENTS
             Text Panel: THE QUIET BETWEEN MOMENTS
         ------------------------------------------------------------- */}
-        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-11 md:space-y-16 mb-0 sm:mb-20 md:mb-28 pt-3.5 xs:pt-4 sm:pt-[14px] md:pt-[14px] lg:pt-8 border-t border-[#302B25]/40">
+        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-7 md:space-y-7 lg:space-y-8 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-0 pt-3.5 xs:pt-4 sm:pt-[14px] md:pt-[14px] lg:pt-8 border-t border-[#302B25]/40">
           {/* Row 1: Neoclassical Silhouette + Waterfront Reverie & Text Panel */}
           <div className="grid grid-cols-2 md:grid-cols-12 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start">
             {/* Desktop & Tablet: Image 11 in left 5-column span */}
@@ -355,7 +469,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             EXTENDED CHAPTER C: THE ATMOSPHERE AND SETTING
             Text Panels: IN A WORLD OF OUR OWN & WE FOUND FOREVER
         ------------------------------------------------------------- */}
-        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-7 md:space-y-7 lg:space-y-8 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-28 pt-3.5 xs:pt-4 sm:pt-6 md:pt-8 border-t border-[#302B25]/40">
+        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-7 md:space-y-7 lg:space-y-8 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-0 pt-3.5 xs:pt-4 sm:pt-6 md:pt-8 border-t border-[#302B25]/40">
           {/* Full-width Panoramic: Amalfi Cliffside Terrace with Bougainvillea (Frame 16) */}
           <div className="w-full">
             <PhotoFrame
@@ -381,16 +495,24 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
               />
             </div>
 
-            {/* Right Column: Top Right Panel (IN A WORLD OF OUR OWN) + Frame 18 (Groom Portrait) */}
+            {/* Right Column: Top Right Panel (IN A WORLD OF OUR OWN) + Frame 18 (Groom Portrait)
+                - Mobile & Tablet (< lg): Exact original responsive layout, 100% untouched
+                - Desktop (lg+): Increased Image 18 height so its bottom aligns naturally past 'WE FOUND FOREVER'
+                  with vertical framing (aspect-[18/25], clamped to 720px–770px)
+                  and centered max-width (540px–580px) matching the companion text panel.
+            */}
             <div className="col-span-1 md:col-span-7 flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-6 md:space-y-8">
               <EditorialTextPanel
                 lines={['IN A WORLD OF', 'OUR OWN']}
                 aspectRatioClass="aspect-square sm:aspect-[16/8]"
+                className="w-full lg:max-w-[540px] xl:max-w-[580px] lg:mx-auto"
                 textClassName="text-base xs:text-lg sm:text-2xl md:text-3xl lg:text-[34px] xl:text-[38px] leading-[1.08] tracking-[0.04em]"
               />
               <PhotoFrame
                 item={getItem('chC-twilight-landscape')}
-                aspectRatioClass={PORTRAIT_ASPECT}
+                aspectRatioClass="aspect-[9/13.5] lg:aspect-[18/25] lg:max-h-[720px] xl:max-h-[770px]"
+                className="w-full lg:max-w-[540px] xl:max-w-[580px] lg:mx-auto"
+                objectPosition="center 20%"
               />
             </div>
             {/* Frame 20 (The Whispered Toast / Candid Embrace):
@@ -404,12 +526,68 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             </div>
           </div>
 
-          {/* Botanical Floral Detail (Frame 21) - Desktop & Tablet */}
-          <div className="hidden sm:block w-full max-w-2xl mx-auto">
+          {/* Botanical Floral Detail (Frame 21) - "DETAILS THAT MATTER"
+              - Tablet (< lg): Exact original centered layout, 100% untouched
+              - Mobile (< sm): Hidden, untouched
+              - Desktop (lg+): 3-column editorial composition with poetic words on left and right flanking the center frame */}
+          <div className="hidden sm:block lg:hidden w-full max-w-2xl mx-auto">
             <PhotoFrame
               item={getItem('chC-floral-detail')}
               aspectRatioClass={LANDSCAPE_ASPECT}
             />
+          </div>
+
+          {/* Desktop Only (lg+): Editorial Triptych flanking DETAILS THAT MATTER */}
+          <div className="hidden lg:grid lg:grid-cols-12 lg:gap-8 items-stretch w-full">
+            {/* Left Column (Cols 1-3): Poetic Editorial Words */}
+            <div className="lg:col-span-3 flex flex-col select-none">
+              <EditorialTextPanel
+                eyebrow="CHAPTER C // THE ESSENCE"
+                eyebrowClassName="text-[9px] xl:text-[10px] uppercase tracking-[0.24em] text-[#D5CEC2]/60 mb-2.5 xl:mb-3.5"
+                lines={['WHAT THE', 'HEART', 'NOTICES']}
+                className="flex-1 w-full min-h-0"
+                aspectRatioClass="h-full min-h-[300px]"
+                paddingClassName="p-4 lg:p-6 xl:p-8"
+                textClassName="text-xl lg:text-[22px] xl:text-[26px] 2xl:text-[30px] leading-[1.12] tracking-[0.05em]"
+                spaceClassName="space-y-1.5 lg:space-y-2.5 xl:space-y-3"
+                subtitle="Whispered in silk, cradled in sacred light."
+                subtitleClassName="font-editorial italic font-normal text-xs lg:text-[13px] xl:text-sm text-[#D5CEC2]/75 mt-3 lg:mt-4 xl:mt-5 tracking-[0.02em] max-w-[220px] leading-relaxed text-center"
+              />
+              <div className="mt-2 sm:mt-2.5 md:mt-3.5">
+                <p className="text-[8px] xs:text-[8.5px] sm:text-[9.5px] md:text-[10px] uppercase tracking-[0.18em] xs:tracking-[0.2em] sm:tracking-[0.24em] font-medium text-[#D5CEC2] leading-tight">
+                  THE UNSEEN GRACE
+                </p>
+              </div>
+            </div>
+
+            {/* Center Column (Cols 4-9 = 6 cols): Floral Detail Frame */}
+            <div className="lg:col-span-6 flex flex-col">
+              <PhotoFrame
+                item={getItem('chC-floral-detail')}
+                aspectRatioClass={LANDSCAPE_ASPECT}
+              />
+            </div>
+
+            {/* Right Column (Cols 10-12 = 3 cols): Poetic Editorial Words */}
+            <div className="lg:col-span-3 flex flex-col select-none">
+              <EditorialTextPanel
+                eyebrow="CHAPTER C // THE IMPRINT"
+                eyebrowClassName="text-[9px] xl:text-[10px] uppercase tracking-[0.24em] text-[#D5CEC2]/60 mb-2.5 xl:mb-3.5"
+                lines={['A LIFETIME', 'WRITTEN', 'IN BLOOM']}
+                className="flex-1 w-full min-h-0"
+                aspectRatioClass="h-full min-h-[300px]"
+                paddingClassName="p-4 lg:p-6 xl:p-8"
+                textClassName="text-xl lg:text-[22px] xl:text-[26px] 2xl:text-[30px] leading-[1.12] tracking-[0.05em]"
+                spaceClassName="space-y-1.5 lg:space-y-2.5 xl:space-y-3"
+                subtitle="...where fleeting beauty turns eternal."
+                subtitleClassName="font-editorial italic font-normal text-xs lg:text-[13px] xl:text-sm text-[#D5CEC2]/75 mt-3 lg:mt-4 xl:mt-5 tracking-[0.02em] max-w-[220px] leading-relaxed text-center"
+              />
+              <div className="mt-2 sm:mt-2.5 md:mt-3.5">
+                <p className="text-[8px] xs:text-[8.5px] sm:text-[9.5px] md:text-[10px] uppercase tracking-[0.18em] xs:tracking-[0.2em] sm:tracking-[0.24em] font-medium text-[#D5CEC2] leading-tight">
+                  BOTANICAL MEMORY
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -417,7 +595,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             EXTENDED CHAPTER D: THE FINAL PHOTOGRAPHIC SEQUENCE
             Text Panel: WHAT WE KEEP, WE REMEMBER
         ------------------------------------------------------------- */}
-        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-12 md:space-y-16 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-28 pt-3.5 xs:pt-4 sm:pt-[14px] md:pt-[14px] lg:pt-8 border-t border-[#302B25]/40">
+        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-7 md:space-y-7 lg:space-y-8 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-0 pt-3.5 xs:pt-4 sm:pt-[14px] md:pt-[14px] lg:pt-8 border-t border-[#302B25]/40">
           {/* Row 1: The Slow Dance (Frame 22) + Midnight Departure (Frame 23) */}
           {/* Desktop & Tablet: Wide 2/3 + 1/3 composition */}
           <div className="hidden md:grid md:grid-cols-12 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start">
@@ -497,7 +675,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             EXTENDED CHAPTER E: THE MEMORY AND THE COVENANT (FRAMES 25 - 31)
             Text Panel: WHERE EVERY STORY BEGINS
         ------------------------------------------------------------- */}
-        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-7 md:space-y-7 lg:space-y-16 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-28 pt-3.5 xs:pt-4 sm:pt-[14px] md:pt-[14px] lg:pt-16 border-t border-[#302B25]/40">
+        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-7 md:space-y-7 lg:space-y-8 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-0 pt-3.5 xs:pt-4 sm:pt-[14px] md:pt-[14px] lg:pt-8 border-t border-[#302B25]/40">
           {/* Frame 25: The Azure Horizon (Where Every Story Begins) */}
           {/* Mobile: Editorial Text Panel (Left) + Vertical Portrait (Right) */}
           {/* Tablet & Desktop: Large Standalone Hero Landscape */}
@@ -522,30 +700,59 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             </div>
           </div>
 
-          {/* Group 1: Paired Vertical Portraits - Classical Form (Frame 26) & Gilded Thread (Frame 27) */}
-          <div className="grid grid-cols-2 md:grid-cols-12 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start">
-            <div className="col-span-1 md:col-span-6">
-              <PhotoFrame
-                item={getItem('chE-monumental-elegance')}
-                aspectRatioClass={PORTRAIT_ASPECT}
-                objectPosition="center 20%"
-              />
+          {/* Group 1: Paired Vertical Portraits on Left (Frame 26: THE SILENCE OF TIME & Frame 27: ALL THAT WORDS CANNOT HOLD) + Poetic Words Panel on Right
+              - Mobile & Tablet (< lg): 100% untouched 2-column grid of vertical portraits
+              - Desktop (lg+): Two vertical frames on left (8 cols) and poetic words panel on right (4 cols), identical to Frames 6 & 7 standard
+          */}
+          <div className="grid grid-cols-2 lg:grid-cols-12 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start w-full">
+            {/* Left Side (Desktop: 8 cols, Mobile/Tablet: 2 cols): Two Vertical Frames */}
+            <div className="col-span-2 lg:col-span-8 grid grid-cols-2 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start">
+              <div className="col-span-1">
+                <PhotoFrame
+                  item={getItem('chE-monumental-elegance')}
+                  aspectRatioClass={FRAMES_6_7_ASPECT}
+                  objectPosition="center 20%"
+                />
+              </div>
+              <div className="col-span-1">
+                <PhotoFrame
+                  item={getItem('chE-embroidered-heritage')}
+                  aspectRatioClass={FRAMES_6_7_ASPECT}
+                  objectPosition="center 25%"
+                />
+              </div>
             </div>
-            <div className="col-span-1 md:col-span-6">
-              <PhotoFrame
-                item={getItem('chE-embroidered-heritage')}
-                aspectRatioClass={PORTRAIT_ASPECT}
-                objectPosition="center 25%"
+
+            {/* Right Side (Desktop: 4 cols): Poetic Editorial Words Panel */}
+            <div className="hidden lg:flex lg:col-span-4 flex-col select-none">
+              <EditorialTextPanel
+                lines={[
+                  'WHAT REMAINS',
+                  'WHEN WORDS',
+                  'FALL SILENT',
+                ]}
+                aspectRatioClass={FRAMES_6_7_ASPECT}
+                paddingClassName="p-4 lg:p-8 xl:p-12"
+                textClassName="text-xl sm:text-2xl md:text-3xl lg:text-[26px] xl:text-[32px] 2xl:text-[36px] leading-[1.12] tracking-[0.05em]"
+                spaceClassName="space-y-2 lg:space-y-3 xl:space-y-4"
+                subtitle="A quiet eternity held between the sacred architectures of love."
+                subtitleClassName="font-editorial italic font-normal text-xs lg:text-[13px] xl:text-sm text-[#D5CEC2]/75 mt-4 lg:mt-6 tracking-[0.02em] max-w-[260px] leading-relaxed"
               />
+              <div className="mt-2 sm:mt-2.5 md:mt-3.5">
+                <p className="text-[8px] xs:text-[8.5px] sm:text-[9.5px] md:text-[10px] uppercase tracking-[0.18em] xs:tracking-[0.2em] sm:tracking-[0.24em] font-medium text-[#D5CEC2] leading-tight">
+                  SILENT ETERNITY
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Group 2: Asymmetric Editorial Pair - Text Panel + Quiet Covenant (Frame 28) */}
-          <div className="grid grid-cols-2 md:grid-cols-12 gap-x-3.5 xs:gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-3.5 xs:gap-y-4 sm:gap-y-3 md:gap-y-0 items-start">
-            <div className="col-span-2 md:col-span-5">
+          {/* Group 2: Asymmetric Editorial Pair - Text Panel + Quiet Covenant (Frame 28: A LIFE, BEAUTIFULLY SHARED) */}
+          <div className="grid grid-cols-2 md:grid-cols-12 gap-x-3.5 xs:gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-3.5 xs:gap-y-4 sm:gap-y-3 md:gap-y-0 items-stretch">
+            <div className="col-span-2 md:col-span-5 flex flex-col">
               <EditorialTextPanel
                 lines={['WHERE EVERY', 'STORY BEGINS']}
-                aspectRatioClass="aspect-[16/6.9] sm:aspect-[16/6.45] md:aspect-square"
+                aspectRatioClass="aspect-[16/6.9] sm:aspect-[16/6.45] md:aspect-auto md:h-full"
+                className="h-full"
                 paddingClassName="py-2.5 px-3 xs:py-3.5 xs:px-4 sm:py-5 sm:px-6 md:p-8 lg:p-10"
                 textClassName="text-[17px] xs:text-[20px] sm:text-[26px] md:text-[30px] lg:text-[38px] xl:text-[43px] leading-[1.08] tracking-[0.05em] sm:tracking-[0.06em]"
                 spaceClassName="space-y-1 xs:space-y-1.5 sm:space-y-2 md:space-y-2.5"
@@ -604,7 +811,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             EXTENDED CHAPTER F: ALL THAT WORDS CANNOT HOLD (FRAMES 32 - 36)
             Text Panel: ALL THAT WORDS CANNOT HOLD
         ------------------------------------------------------------- */}
-        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-11 md:space-y-16 mb-0 sm:mb-[22px] md:mb-[22px] lg:mb-28 pt-3.5 xs:pt-4 sm:pt-[14px] md:pt-[14px] lg:pt-16 border-t border-[#302B25]/40">
+        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-7 md:space-y-7 lg:space-y-8 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-0 pt-3.5 xs:pt-4 sm:pt-[14px] md:pt-[14px] lg:pt-8 border-t border-[#302B25]/40">
           {/* Group 4: Three Vertical Studies in Subtle Rhythm (Frames 32, 33, 34) */}
           {/* Desktop & Tablet: 3 columns | Mobile: 2-column editorial with balanced distribution */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start">
@@ -631,22 +838,23 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             </div>
           </div>
 
-          {/* Group 5: Final Editorial Interlude + Twilight Celebration (Frame 35) */}
-          <div className="grid grid-cols-2 md:grid-cols-12 gap-x-3.5 xs:gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-3.5 xs:gap-y-4 sm:gap-y-3 md:gap-y-0 items-start">
-            <div className="col-span-2 md:col-span-5">
-              <EditorialTextPanel
-                lines={['ALL THAT WORDS', 'CANNOT HOLD']}
-                aspectRatioClass="aspect-[16/6.9] sm:aspect-[16/6.45] md:aspect-square"
-                paddingClassName="py-2.5 px-3 xs:py-3.5 xs:px-4 sm:py-5 sm:px-6 md:p-8 lg:p-10"
-                textClassName="text-[17px] xs:text-[20px] sm:text-[26px] md:text-[30px] lg:text-[38px] xl:text-[43px] leading-[1.08] tracking-[0.05em] sm:tracking-[0.06em]"
-                spaceClassName="space-y-1 xs:space-y-1.5 sm:space-y-2 md:space-y-2.5"
-              />
-            </div>
+          {/* Group 5: Final Editorial Interlude + Twilight Celebration (Frame 35: AS NIGHT DESCENDS) on Left & Text Panel (ALL THAT WORDS CANNOT HOLD) on Right */}
+          <div className="grid grid-cols-2 md:grid-cols-12 gap-x-3.5 xs:gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-3.5 xs:gap-y-4 sm:gap-y-3 md:gap-y-0 items-stretch">
             <div className="col-span-2 md:col-span-7">
               <PhotoFrame
                 item={getItem('chF-twilight-celebration')}
                 aspectRatioClass={LANDSCAPE_ASPECT}
                 objectPosition="center 45%"
+              />
+            </div>
+            <div className="col-span-2 md:col-span-5 flex flex-col">
+              <EditorialTextPanel
+                lines={['ALL THAT WORDS', 'CANNOT HOLD']}
+                aspectRatioClass="aspect-[16/6.9] sm:aspect-[16/6.45] md:aspect-auto md:h-full"
+                className="h-full"
+                paddingClassName="py-2.5 px-3 xs:py-3.5 xs:px-4 sm:py-5 sm:px-6 md:p-8 lg:p-10"
+                textClassName="text-[17px] xs:text-[20px] sm:text-[26px] md:text-[30px] lg:text-[38px] xl:text-[43px] leading-[1.08] tracking-[0.05em] sm:tracking-[0.06em]"
+                spaceClassName="space-y-1 xs:space-y-1.5 sm:space-y-2 md:space-y-2.5"
               />
             </div>
           </div>
@@ -661,41 +869,70 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             EXTENDED CHAPTER G: THE ECHO OF CELEBRATION (FRAMES 37 - 40)
             Text Panel: THE ECHO OF A CELEBRATION
         ------------------------------------------------------------- */}
-        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-11 md:space-y-16 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-28 pt-3.5 xs:pt-4 sm:pt-[22px] md:pt-[22px] lg:pt-16 border-t border-[#302B25]/40">
-          {/* Group 1: Paired Vertical Portraits - Blush Shoreline (Frame 37) & Sculptural Veil (Frame 38) */}
-          <div className="grid grid-cols-2 md:grid-cols-12 gap-3.5 xs:gap-4 sm:gap-6 md:gap-8 items-start">
-            <div className="col-span-1 md:col-span-6">
-              <PhotoFrame
-                item={getItem('chG-blush-shoreline')}
-                aspectRatioClass={PORTRAIT_ASPECT}
-                objectPosition="center 25%"
+        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-7 md:space-y-7 lg:space-y-8 mb-0 sm:mb-[14px] md:mb-[14px] lg:mb-0 pt-3.5 xs:pt-4 sm:pt-[14px] md:pt-[14px] lg:pt-8 border-t border-[#302B25]/40">
+          {/* Group 1: Poetic Words Panel on Left + Paired Vertical Portraits on Right (Frame 37: GOLDEN TIDES OF DEVOTION & Frame 38: ARCHITECTURAL STILLNESS)
+              - Mobile & Tablet (< lg): 100% untouched 2-column grid of vertical portraits
+              - Desktop (lg+): Poetic words panel on left (4 cols) and two vertical frames on right (8 cols)
+          */}
+          <div className="grid grid-cols-2 lg:grid-cols-12 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start w-full">
+            {/* Left Side (Desktop: 4 cols): Poetic Editorial Words Panel */}
+            <div className="hidden lg:flex lg:col-span-4 flex-col select-none">
+              <EditorialTextPanel
+                lines={[
+                  'BETWEEN TIDES',
+                  'AND SACRED',
+                  'STILLNESS',
+                ]}
+                aspectRatioClass={FRAMES_6_7_ASPECT}
+                paddingClassName="p-4 lg:p-8 xl:p-12"
+                textClassName="text-xl sm:text-2xl md:text-3xl lg:text-[26px] xl:text-[32px] 2xl:text-[36px] leading-[1.12] tracking-[0.05em]"
+                spaceClassName="space-y-2 lg:space-y-3 xl:space-y-4"
+                subtitle="Where restless waters meet enduring stone, love builds its eternal sanctuary."
+                subtitleClassName="font-editorial italic font-normal text-xs lg:text-[13px] xl:text-sm text-[#D5CEC2]/75 mt-4 lg:mt-6 tracking-[0.02em] max-w-[260px] leading-relaxed"
               />
+              <div className="mt-2 sm:mt-2.5 md:mt-3.5">
+                <p className="text-[8px] xs:text-[8.5px] sm:text-[9.5px] md:text-[10px] uppercase tracking-[0.18em] xs:tracking-[0.2em] sm:tracking-[0.24em] font-medium text-[#D5CEC2] leading-tight">
+                  COASTAL SANCTUARY
+                </p>
+              </div>
             </div>
-            <div className="col-span-1 md:col-span-6">
-              <PhotoFrame
-                item={getItem('chG-skyline-sculpture')}
-                aspectRatioClass={PORTRAIT_ASPECT}
-                objectPosition="center 20%"
-              />
+
+            {/* Right Side (Desktop: 8 cols, Mobile/Tablet: 2 cols): Two Vertical Frames */}
+            <div className="col-span-2 lg:col-span-8 grid grid-cols-2 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start">
+              <div className="col-span-1">
+                <PhotoFrame
+                  item={getItem('chG-blush-shoreline')}
+                  aspectRatioClass={FRAMES_6_7_ASPECT}
+                  objectPosition="center 25%"
+                />
+              </div>
+              <div className="col-span-1">
+                <PhotoFrame
+                  item={getItem('chG-skyline-sculpture')}
+                  aspectRatioClass={FRAMES_6_7_ASPECT}
+                  objectPosition="center 20%"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Group 2: Asymmetric Editorial Pair - Text Panel + Radiant Procession (Frame 39) */}
-          <div className="grid grid-cols-2 md:grid-cols-12 gap-x-3.5 xs:gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-3.5 xs:gap-y-4 sm:gap-y-3 md:gap-y-0 items-start">
-            <div className="col-span-2 md:col-span-5">
-              <EditorialTextPanel
-                lines={['THE ECHO OF', 'A CELEBRATION']}
-                aspectRatioClass="aspect-[16/6.9] sm:aspect-[16/6.45] md:aspect-square"
-                paddingClassName="py-2.5 px-3 xs:py-3.5 xs:px-4 sm:py-5 sm:px-6 md:p-8 lg:p-10"
-                textClassName="text-[17px] xs:text-[20px] sm:text-[26px] md:text-[30px] lg:text-[38px] xl:text-[43px] leading-[1.08] tracking-[0.05em] sm:tracking-[0.06em]"
-                spaceClassName="space-y-1 xs:space-y-1.5 sm:space-y-2 md:space-y-2.5"
-              />
-            </div>
+          {/* Group 2: Asymmetric Editorial Pair - Radiant Procession (Frame 39: PULSE OF THE CELEBRATION) on Left & Text Panel (THE ECHO OF A CELEBRATION) on Right */}
+          <div className="grid grid-cols-2 md:grid-cols-12 gap-x-3.5 xs:gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-3.5 xs:gap-y-4 sm:gap-y-3 md:gap-y-0 items-stretch">
             <div className="col-span-2 md:col-span-7">
               <PhotoFrame
                 item={getItem('chG-festive-rhapsody')}
                 aspectRatioClass={LANDSCAPE_ASPECT}
                 objectPosition="center 30%"
+              />
+            </div>
+            <div className="col-span-2 md:col-span-5 flex flex-col">
+              <EditorialTextPanel
+                lines={['THE ECHO OF', 'A CELEBRATION']}
+                aspectRatioClass="aspect-[16/6.9] sm:aspect-[16/6.45] md:aspect-auto md:h-full"
+                className="h-full"
+                paddingClassName="py-2.5 px-3 xs:py-3.5 xs:px-4 sm:py-5 sm:px-6 md:p-8 lg:p-10"
+                textClassName="text-[17px] xs:text-[20px] sm:text-[26px] md:text-[30px] lg:text-[38px] xl:text-[43px] leading-[1.08] tracking-[0.05em] sm:tracking-[0.06em]"
+                spaceClassName="space-y-1 xs:space-y-1.5 sm:space-y-2 md:space-y-2.5"
               />
             </div>
           </div>
@@ -714,24 +951,50 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             EXTENDED CHAPTER H: ETERNITY IN A SINGLE GLANCE (FRAMES 41 - 44)
             Text Panel: ETERNITY IN A SINGLE GLANCE
         ------------------------------------------------------------- */}
-        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-11 md:space-y-16 pt-3.5 xs:pt-4 sm:pt-[14px] md:pt-[14px] lg:pt-16 border-t border-[#302B25]/40">
-          {/* Group 3: Paired Vertical Studies - Botanical Stillness (Frame 41) & Ritual Touch (Frame 42) */}
-          {/* On Mobile: Rendered first in Chapter H, immediately followed by Where Shadows Turn to Gold */}
-          {/* On Desktop & Tablet: Renders as standard paired vertical portraits */}
-          <div className="grid grid-cols-2 md:grid-cols-12 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start">
-            <div className="col-span-1 md:col-span-6">
-              <PhotoFrame
-                item={getItem('chH-botanical-stillness')}
-                aspectRatioClass={PORTRAIT_ASPECT}
-                objectPosition="center center"
+        <div className="w-full flex flex-col space-y-3.5 xs:space-y-4 sm:space-y-7 md:space-y-7 lg:space-y-8 pt-3.5 xs:pt-4 sm:pt-[14px] md:pt-[14px] lg:pt-8 border-t border-[#302B25]/40">
+          {/* Group 3: Poetic Words Panel on Left + Paired Vertical Studies on Right (Frame 41: POETRY IN SILENT DETAILS & Frame 42: HONORING THE SACRED)
+              - Mobile & Tablet (< lg): 100% untouched 2-column grid of vertical portraits
+              - Desktop (lg+): Poetic words panel on left (4 cols) and two vertical frames on right (8 cols), matching the layout of 'ETERNITY IN A SINGLE GLANCE' below
+          */}
+          <div className="grid grid-cols-2 lg:grid-cols-12 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start w-full">
+            {/* Left Side (Desktop: 4 cols): Poetic Editorial Words Panel */}
+            <div className="hidden lg:flex lg:col-span-4 flex-col select-none">
+              <EditorialTextPanel
+                lines={[
+                  'THE POETRY OF',
+                  'SILENT THINGS',
+                  'HELD SACRED',
+                ]}
+                aspectRatioClass={FRAMES_6_7_ASPECT}
+                paddingClassName="p-4 lg:p-8 xl:p-12"
+                textClassName="text-xl sm:text-2xl md:text-3xl lg:text-[26px] xl:text-[32px] 2xl:text-[36px] leading-[1.12] tracking-[0.05em]"
+                spaceClassName="space-y-2 lg:space-y-3 xl:space-y-4"
+                subtitle="In every quiet gesture and sacred vow, love recognizes its forever."
+                subtitleClassName="font-editorial italic font-normal text-xs lg:text-[13px] xl:text-sm text-[#D5CEC2]/75 mt-4 lg:mt-6 tracking-[0.02em] max-w-[260px] leading-relaxed"
               />
+              <div className="mt-2 sm:mt-2.5 md:mt-3.5">
+                <p className="text-[8px] xs:text-[8.5px] sm:text-[9.5px] md:text-[10px] uppercase tracking-[0.18em] xs:tracking-[0.2em] sm:tracking-[0.24em] font-medium text-[#D5CEC2] leading-tight">
+                  SACRED DEVOTION
+                </p>
+              </div>
             </div>
-            <div className="col-span-1 md:col-span-6">
-              <PhotoFrame
-                item={getItem('chH-sacred-relic')}
-                aspectRatioClass={PORTRAIT_ASPECT}
-                objectPosition="center center"
-              />
+
+            {/* Right Side (Desktop: 8 cols, Mobile/Tablet: 2 cols): Two Vertical Frames */}
+            <div className="col-span-2 lg:col-span-8 grid grid-cols-2 gap-3.5 xs:gap-4 sm:gap-7 md:gap-7 lg:gap-8 items-start">
+              <div className="col-span-1">
+                <PhotoFrame
+                  item={getItem('chH-botanical-stillness')}
+                  aspectRatioClass={FRAMES_6_7_ASPECT}
+                  objectPosition="center center"
+                />
+              </div>
+              <div className="col-span-1">
+                <PhotoFrame
+                  item={getItem('chH-sacred-relic')}
+                  aspectRatioClass={FRAMES_6_7_ASPECT}
+                  objectPosition="center center"
+                />
+              </div>
             </div>
           </div>
 
@@ -744,22 +1007,23 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
             />
           </div>
 
-          {/* Group 4: Asymmetric Editorial Pair - Text Panel + Moonlit Movement (Frame 43) */}
-          <div className="grid grid-cols-2 md:grid-cols-12 gap-x-3.5 xs:gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-3.5 xs:gap-y-4 sm:gap-y-3 md:gap-y-0 items-start">
-            <div className="col-span-2 md:col-span-5">
-              <EditorialTextPanel
-                lines={['ETERNITY IN A', 'SINGLE GLANCE']}
-                aspectRatioClass="aspect-[16/6.9] sm:aspect-[16/6.45] md:aspect-square"
-                paddingClassName="py-2.5 px-3 xs:py-3.5 xs:px-4 sm:py-5 sm:px-6 md:p-8 lg:p-10"
-                textClassName="text-[17px] xs:text-[20px] sm:text-[26px] md:text-[30px] lg:text-[38px] xl:text-[43px] leading-[1.08] tracking-[0.05em] sm:tracking-[0.06em]"
-                spaceClassName="space-y-1 xs:space-y-1.5 sm:space-y-2 md:space-y-2.5"
-              />
-            </div>
+          {/* Group 4: Asymmetric Editorial Pair - Moonlit Movement (Frame 43: DANCING BENEATH THE STARS) on Left & Text Panel (ETERNITY IN A SINGLE GLANCE) on Right */}
+          <div className="grid grid-cols-2 md:grid-cols-12 gap-x-3.5 xs:gap-x-4 sm:gap-x-6 md:gap-x-8 gap-y-3.5 xs:gap-y-4 sm:gap-y-3 md:gap-y-0 items-stretch">
             <div className="col-span-2 md:col-span-7">
               <PhotoFrame
                 item={getItem('chH-midnight-waltz')}
                 aspectRatioClass={LANDSCAPE_ASPECT}
                 objectPosition="center 35%"
+              />
+            </div>
+            <div className="col-span-2 md:col-span-5 flex flex-col">
+              <EditorialTextPanel
+                lines={['ETERNITY IN A', 'SINGLE GLANCE']}
+                aspectRatioClass="aspect-[16/6.9] sm:aspect-[16/6.45] md:aspect-auto md:h-full"
+                className="h-full"
+                paddingClassName="py-2.5 px-3 xs:py-3.5 xs:px-4 sm:py-5 sm:px-6 md:p-8 lg:p-10"
+                textClassName="text-[17px] xs:text-[20px] sm:text-[26px] md:text-[30px] lg:text-[38px] xl:text-[43px] leading-[1.08] tracking-[0.05em] sm:tracking-[0.06em]"
+                spaceClassName="space-y-1 xs:space-y-1.5 sm:space-y-2 md:space-y-2.5"
               />
             </div>
           </div>
