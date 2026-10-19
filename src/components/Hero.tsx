@@ -77,7 +77,7 @@ export const Hero: React.FC<HeroProps> = ({
           </p>
 
           {/* 2. Oversized Wordmark: 90s FRAME */}
-          <div className="w-full text-center mt-2.5 md:mt-3 mb-1 md:mb-1.5">
+          <div className="w-full text-center mt-[16px] md:mt-[18px] mb-1 md:mb-1.5">
             <h1 className="font-editorial text-[13vw] md:text-[12.5vw] font-normal tracking-[-0.03em] leading-[0.88] text-[#080808] whitespace-nowrap">
               90s FRAME
             </h1>
@@ -345,7 +345,7 @@ export const Hero: React.FC<HeroProps> = ({
           </header>
 
           {/* Mobile Wordmark Area: Single-line "90s FRAME" & Tagline directly under descriptor */}
-          <div className="w-full text-center select-none mt-2.5 xs:mt-3 mb-2 px-1">
+          <div className="w-full text-center select-none mt-[16px] xs:mt-[18px] mb-2 px-1">
             <h1 className="font-editorial text-[13.5vw] xs:text-[14vw] font-normal tracking-[-0.035em] leading-[0.88] text-[#080808] whitespace-nowrap">
               90s FRAME
             </h1>
