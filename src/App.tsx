@@ -104,7 +104,6 @@ export default function App() {
           {/* 90s FILM — AWARDS & JURY DISTINCTIONS (Flowing Medallions Showcase) */}
           <AwardsSection
             onOpenInquiry={() => setIsInquiryOpen(true)}
-            onNavigateToDecide={() => handleNavigatePage('decide')}
           />
         </main>
       )}

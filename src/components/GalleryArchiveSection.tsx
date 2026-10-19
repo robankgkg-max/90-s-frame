@@ -157,7 +157,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
           <PhotoFrame
             item={getItem('opening-yacht-proposal')}
             aspectRatioClass={HERO_LANDSCAPE_ASPECT}
-            objectPosition="center 0%"
+            objectPosition="center 17%"
             priority={true}
           />
         </div>

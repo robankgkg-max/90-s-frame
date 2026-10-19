@@ -43,7 +43,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
     action?: () => void;
   }> = [
     { label: 'HOME', page: 'home', id: 'hero' },
-    { label: 'PHILOSOPHY', page: 'home', id: 'philosophy' },
+    { label: 'PHILOSOPHY', page: 'decide', id: 'about' },
     { label: 'FILM ARCHIVE', page: 'home', id: 'archive' },
     { label: 'LOST SIGNAL (FILMS)', page: 'home', id: 'films' },
     { label: 'AWARDS & DISTINCTIONS', page: 'home', id: 'awards' },

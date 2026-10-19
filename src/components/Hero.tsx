@@ -49,31 +49,8 @@ export const Hero: React.FC<HeroProps> = ({
     <section
       id="hero"
       aria-label="Hero Section"
-      className="relative w-full min-h-screen lg:h-screen lg:max-h-[1100px] bg-white text-[#080808] flex flex-col justify-between overflow-x-hidden selection:bg-[#080808] selection:text-white"
+      className="relative w-full min-h-screen lg:h-screen lg:max-h-[1100px] bg-white text-[#080808] flex flex-col justify-start md:justify-between overflow-x-hidden selection:bg-[#080808] selection:text-white"
     >
-      {/* =========================================================================
-          MOBILE HEADER (< 768px)
-      ========================================================================= */}
-      <header className="relative w-full pt-5 px-5 flex items-center justify-between z-30 shrink-0 md:hidden">
-        <div className="w-7 shrink-0" />
-        <div className="flex-1 text-center select-none px-2">
-          <p className="text-[8px] xs:text-[8.5px] uppercase tracking-[0.18em] font-medium leading-none text-[#080808] whitespace-nowrap">
-            WEDDING PHOTOGRAPHY &amp; CINEMATOGRAPHY
-          </p>
-        </div>
-        <div className="w-7 flex items-center justify-end shrink-0">
-          <button
-            onClick={onOpenMenu}
-            aria-label="Open navigation menu"
-            className="group flex flex-col justify-between w-6 h-3.5 cursor-pointer p-0.5 -mr-1 hover:opacity-60 transition-opacity shrink-0"
-          >
-            <span className="block w-full h-[1.2px] bg-[#080808]" />
-            <span className="block w-full h-[1.2px] bg-[#080808]" />
-            <span className="block w-full h-[1.2px] bg-[#080808]" />
-          </button>
-        </div>
-      </header>
-
       {/* =========================================================================
           APPROVED TABLET HERO (768px - 1023px)
           Exact recreation of '90s Frames_ Unforgettable Wedding Stories.png'
@@ -92,23 +69,22 @@ export const Hero: React.FC<HeroProps> = ({
           </button>
         </div>
 
-        {/* 1. Small Centred Descriptor */}
-        <div className="w-full text-center">
+        {/* Top Typography Header Group (Descriptor, Wordmark, and Tagline tightly grouped) */}
+        <div className="w-full flex flex-col items-center text-center">
+          {/* 1. Small Centred Descriptor */}
           <p className="text-[10px] md:text-[10.5px] uppercase tracking-[0.28em] font-medium text-[#080808]">
             WEDDING PHOTOGRAPHY &amp; CINEMATOGRAPHY
           </p>
-        </div>
 
-        {/* 2. Oversized Wordmark: 90s FRAME */}
-        <div className="w-full text-center mt-3 md:mt-4 mb-1 md:mb-2">
-          <h1 className="font-editorial text-[13vw] md:text-[12.5vw] font-normal tracking-[-0.03em] leading-[0.88] text-[#080808] whitespace-nowrap">
-            90s FRAME
-          </h1>
-        </div>
+          {/* 2. Oversized Wordmark: 90s FRAME */}
+          <div className="w-full text-center mt-2.5 md:mt-3 mb-1 md:mb-1.5">
+            <h1 className="font-editorial text-[13vw] md:text-[12.5vw] font-normal tracking-[-0.03em] leading-[0.88] text-[#080808] whitespace-nowrap">
+              90s FRAME
+            </h1>
+          </div>
 
-        {/* 3. Centred Tagline: Some moments deserve forever. */}
-        <div className="w-full text-center mb-4 md:mb-5">
-          <p className="font-editorial italic font-normal text-2xl md:text-[26px] tracking-[0.015em] text-[#080808]">
+          {/* 3. Centred Tagline: Some moments deserve forever. */}
+          <p className="font-editorial italic font-normal text-2xl md:text-[26px] tracking-[0.015em] text-[#080808] mt-1 mb-2">
             Some moments deserve forever.
           </p>
         </div>
@@ -344,15 +320,39 @@ export const Hero: React.FC<HeroProps> = ({
           MOBILE LAYOUT (< 768px)
           Faithfully reproduces '90s Frames_ Unforgettable Wedding Moments.png'
       ========================================================================= */}
-      <div className="flex md:hidden flex-col w-full px-5 pt-2 pb-8">
-        {/* Mobile Wordmark Area: Single-line "90s FRAME" & Tagline Underneath */}
-        <div className="w-full text-center select-none mt-3.5 mb-2.5 px-2">
-          <h1 className="font-editorial text-[13.5vw] xs:text-[14vw] font-normal tracking-[-0.035em] leading-[0.88] text-[#080808] whitespace-nowrap">
-            90s FRAME
-          </h1>
-          <p className="font-editorial italic font-normal text-[18px] xs:text-[20px] tracking-[0.015em] text-[#080808] mt-2">
-            Some moments deserve forever.
-          </p>
+      <div className="flex md:hidden flex-col w-full min-h-screen justify-between px-4 xs:px-5 pb-8">
+        {/* Top Header & Title Group: Descriptor, Menu & Wordmark closely bound */}
+        <div className="w-full flex flex-col select-none">
+          {/* Mobile Header Bar */}
+          <header className="relative w-full pt-4 xs:pt-5 flex items-center justify-between z-30 shrink-0">
+            <div className="w-7 shrink-0" />
+            <div className="flex-1 text-center select-none px-1">
+              <p className="text-[8px] xs:text-[8.5px] uppercase tracking-[0.18em] font-medium leading-none text-[#080808] whitespace-nowrap">
+                WEDDING PHOTOGRAPHY &amp; CINEMATOGRAPHY
+              </p>
+            </div>
+            <div className="w-7 flex items-center justify-end shrink-0">
+              <button
+                onClick={onOpenMenu}
+                aria-label="Open navigation menu"
+                className="group flex flex-col justify-between w-6 h-3.5 cursor-pointer p-0.5 -mr-1 hover:opacity-60 transition-opacity shrink-0"
+              >
+                <span className="block w-full h-[1.2px] bg-[#080808]" />
+                <span className="block w-full h-[1.2px] bg-[#080808]" />
+                <span className="block w-full h-[1.2px] bg-[#080808]" />
+              </button>
+            </div>
+          </header>
+
+          {/* Mobile Wordmark Area: Single-line "90s FRAME" & Tagline directly under descriptor */}
+          <div className="w-full text-center select-none mt-2.5 xs:mt-3 mb-2 px-1">
+            <h1 className="font-editorial text-[13.5vw] xs:text-[14vw] font-normal tracking-[-0.035em] leading-[0.88] text-[#080808] whitespace-nowrap">
+              90s FRAME
+            </h1>
+            <p className="font-editorial italic font-normal text-[18px] xs:text-[20px] tracking-[0.015em] text-[#080808] mt-1.5 xs:mt-2">
+              Some moments deserve forever.
+            </p>
+          </div>
         </div>
 
         {/* Mobile Collage Canvas */}

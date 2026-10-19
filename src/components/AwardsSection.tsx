@@ -54,12 +54,9 @@ export const AWARDS_DATA: AwardItem[] = [
 
 interface AwardsSectionProps {
   onOpenInquiry?: () => void;
-  onNavigateToDecide?: () => void;
 }
 
-export const AwardsSection: React.FC<AwardsSectionProps> = ({
-  onNavigateToDecide,
-}) => {
+export const AwardsSection: React.FC<AwardsSectionProps> = () => {
   const [direction, setDirection] = useState<'left' | 'right'>('left');
   const [isHovered, setIsHovered] = useState(false);
 
@@ -207,31 +204,6 @@ export const AwardsSection: React.FC<AwardsSectionProps> = ({
           ))}
         </div>
       </div>
-
-      {/* Editorial Portal to the Decide Page */}
-      {onNavigateToDecide && (
-        <div className="relative z-20 mt-12 sm:mt-16 text-center border-t border-white/10 pt-10 px-4 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#DFBA73]" />
-            <span className="text-[10px] font-mono tracking-[0.26em] uppercase text-[#DFBA73]">
-              CONTINUE JOURNEY
-            </span>
-          </div>
-          <h3 className="font-editorial text-2xl sm:text-3xl text-white tracking-tight mb-2">
-            Proceed to the Decide Archive
-          </h3>
-          <p className="text-xs font-mono tracking-[0.16em] text-[#EDE7DC]/60 uppercase mb-6 max-w-md mx-auto">
-            Full editorial monographs, couple stories &amp; studio craft
-          </p>
-          <button
-            onClick={onNavigateToDecide}
-            className="group inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-[#DFBA73] hover:bg-white text-[#0A0A0A] font-mono text-xs tracking-[0.22em] uppercase font-bold transition-all duration-300 hover:scale-105 shadow-[0_8px_24px_rgba(223,186,115,0.25)] cursor-pointer"
-          >
-            <span>DECIDE PAGE</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </button>
-        </div>
-      )}
     </section>
   );
 };

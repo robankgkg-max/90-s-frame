@@ -161,9 +161,10 @@ export const CRTTelevision: React.FC<CRTTelevisionProps> = ({
   const [scanlinesEnabled, setScanlinesEnabled] = useState(true);
   const [isFlickering, setIsFlickering] = useState(false);
   const [channelTuning, setChannelTuning] = useState(reel.channelNumber);
-  const [isHovered, setIsHovered] = useState(false);
+  const [showCenterButton, setShowCenterButton] = useState(true);
   const [hasStarted, setHasStarted] = useState(false);
 
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const ytPlayerRef = useRef<any>(null);
   const ytContainerRef = useRef<HTMLDivElement>(null);
   const pendingPlayRef = useRef(false);
@@ -366,6 +367,54 @@ export const CRTTelevision: React.FC<CRTTelevisionProps> = ({
     }
   };
 
+  // Activity timer: auto-hides center play button after 3 seconds of inactivity while playing,
+  // and immediately restores it upon click/tap/touch
+  const triggerUserActivity = () => {
+    setShowCenterButton(true);
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+    if (isPlaying) {
+      hideTimerRef.current = setTimeout(() => {
+        setShowCenterButton(false);
+      }, 3000);
+    }
+  };
+
+  useEffect(() => {
+    if (isPlaying) {
+      setShowCenterButton(true);
+      if (hideTimerRef.current) {
+        clearTimeout(hideTimerRef.current);
+      }
+      hideTimerRef.current = setTimeout(() => {
+        setShowCenterButton(false);
+      }, 3000);
+    } else {
+      if (hideTimerRef.current) {
+        clearTimeout(hideTimerRef.current);
+        hideTimerRef.current = null;
+      }
+      setShowCenterButton(true);
+    }
+    return () => {
+      if (hideTimerRef.current) {
+        clearTimeout(hideTimerRef.current);
+      }
+    };
+  }, [isPlaying]);
+
+  const handleScreenClick = (e: React.MouseEvent) => {
+    // If video is playing and center button was hidden,
+    // first tap acts as touch response to reveal controls for 3 seconds
+    if (isPlaying && !showCenterButton) {
+      triggerUserActivity();
+      return;
+    }
+    togglePlay();
+  };
+
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
     const nextMuted = !isMuted;
@@ -447,8 +496,8 @@ export const CRTTelevision: React.FC<CRTTelevisionProps> = ({
   return (
     <div
       ref={containerRef}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseMove={triggerUserActivity}
+      onTouchStart={triggerUserActivity}
       className={`relative w-full rounded-2xl sm:rounded-3xl p-2.5 xs:p-3 sm:p-4 md:p-5 pb-2.5 xs:pb-3 sm:pb-3.5 md:pb-4 border transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.35)] ${casingBg}`}
     >
       {/* TV Casing Texture & Screws */}
@@ -468,7 +517,9 @@ export const CRTTelevision: React.FC<CRTTelevisionProps> = ({
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
                 isPlaying
                   ? 'bg-emerald-500 shadow-[0_0_8px_#10B981]'
-                  : 'bg-[#A67C37] shadow-[0_0_6px_#A67C37]'
+                  : isCream
+                  ? 'bg-[#A67C37] shadow-[0_0_6px_#A67C37]'
+                  : 'bg-zinc-500 shadow-[0_0_4px_rgba(255,255,255,0.2)]'
               }`}
             />
             <span className="opacity-70 uppercase font-semibold text-[8px] sm:text-[9px]">
@@ -490,10 +541,14 @@ export const CRTTelevision: React.FC<CRTTelevisionProps> = ({
 
         {/* Vintage Tape Indicator & Channel Tag */}
         <div className="flex items-center gap-2 text-[8px] sm:text-[9px]">
-          <span className="px-1.5 py-0.5 rounded bg-black/30 border border-white/10 font-mono text-[#D4AF37]">
+          <span className={`px-1.5 py-0.5 rounded bg-black/30 border border-white/10 font-mono ${isCream ? 'text-[#D4AF37]' : 'text-zinc-200'}`}>
             CH {channelTuning}
           </span>
-          <span className="hidden xs:inline-block px-1.5 py-0.5 rounded bg-[#A67C37]/20 border border-[#A67C37]/40 text-[#DFBA73] font-mono">
+          <span className={`hidden xs:inline-block px-1.5 py-0.5 rounded font-mono ${
+            isCream
+              ? 'bg-[#A67C37]/20 border border-[#A67C37]/40 text-[#DFBA73]'
+              : 'bg-white/10 border border-white/15 text-zinc-200'
+          }`}>
             {reel.reelNumber}
           </span>
         </div>
@@ -505,7 +560,9 @@ export const CRTTelevision: React.FC<CRTTelevisionProps> = ({
         <div className={`relative w-full ${screenAspectClass} bg-[#080807] rounded-xl sm:rounded-2xl overflow-hidden p-1 sm:p-2 border-2 border-black/80 shadow-[inset_0_5px_15px_rgba(0,0,0,0.95),0_4px_12px_rgba(0,0,0,0.5)]`}>
           {/* The Actual Curved Glass Tube Container */}
           <div
-            onClick={togglePlay}
+            onClick={handleScreenClick}
+            onMouseMove={triggerUserActivity}
+            onTouchStart={triggerUserActivity}
             className="relative w-full h-full rounded-lg sm:rounded-xl overflow-hidden bg-black cursor-pointer group select-none"
           >
             {reel.youtubeId ? (
@@ -605,29 +662,35 @@ export const CRTTelevision: React.FC<CRTTelevisionProps> = ({
               </span>
             </div>
 
-            {/* Center Play Button Overlay (when paused or hovered) */}
-            {(!isPlaying || isHovered) && (
-              <div className="absolute inset-0 z-20 flex items-center justify-center transition-opacity duration-300">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    togglePlay();
-                  }}
-                  aria-label={isPlaying ? 'Pause video' : 'Play wedding film'}
-                  className="group/btn relative w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-[#121110]/85 hover:bg-[#9E7B35] border border-white/20 text-white flex items-center justify-center transition-all duration-300 hover:scale-105 shadow-[0_10px_30px_rgba(0,0,0,0.6)] backdrop-blur-sm"
-                >
-                  {isPlaying ? (
-                    <Pause className="w-6 h-6 sm:w-7 sm:h-7 stroke-[1.5]" />
-                  ) : (
-                    <Play className="w-6 h-6 sm:w-7 sm:h-7 ml-1 stroke-[1.5] fill-white" />
-                  )}
-                  {/* Ring Pulse */}
-                  {!isPlaying && (
-                    <span className="absolute -inset-1 rounded-full border border-white/30 animate-pulse pointer-events-none" />
-                  )}
-                </button>
-              </div>
-            )}
+            {/* Center Play Button Overlay with 3-Second Auto-Hide on Playback & Touch/Click Response */}
+            <div
+              className={`absolute inset-0 z-20 flex items-center justify-center transition-all duration-500 ease-out ${
+                showCenterButton
+                  ? 'opacity-100 scale-100 pointer-events-auto'
+                  : 'opacity-0 scale-95 pointer-events-none'
+              }`}
+            >
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePlay();
+                }}
+                aria-label={isPlaying ? 'Pause video' : 'Play wedding film'}
+                className={`group/btn relative w-14 h-14 sm:w-18 sm:h-18 rounded-full bg-[#121110]/85 ${
+                  isCream ? 'hover:bg-[#9E7B35]' : 'hover:bg-zinc-800'
+                } border border-white/20 text-white flex items-center justify-center transition-all duration-300 hover:scale-105 shadow-[0_10px_30px_rgba(0,0,0,0.6)] backdrop-blur-sm`}
+              >
+                {isPlaying ? (
+                  <Pause className="w-6 h-6 sm:w-7 sm:h-7 stroke-[1.5]" />
+                ) : (
+                  <Play className="w-6 h-6 sm:w-7 sm:h-7 ml-1 stroke-[1.5] fill-white" />
+                )}
+                {/* Ring Pulse */}
+                {!isPlaying && (
+                  <span className="absolute -inset-1 rounded-full border border-white/30 animate-pulse pointer-events-none" />
+                )}
+              </button>
+            </div>
 
             {/* Bottom Screen Subtitle Bar on Video */}
             <div className="absolute bottom-1 left-2.5 right-2.5 sm:bottom-1.5 sm:left-3.5 sm:right-3.5 z-20 flex items-center justify-between text-[8px] sm:text-[9px] font-mono text-white/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] pointer-events-none">
@@ -649,7 +712,7 @@ export const CRTTelevision: React.FC<CRTTelevisionProps> = ({
           <button
             onClick={togglePlay}
             aria-label={isPlaying ? 'Pause video' : 'Play reel'}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/40 hover:bg-[#9E7B35] text-white border border-white/10 transition-colors uppercase tracking-[0.18em] text-[8px] sm:text-[9px]"
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/40 ${isCream ? 'hover:bg-[#9E7B35]' : 'hover:bg-white/20'} text-white border border-white/10 transition-colors uppercase tracking-[0.18em] text-[8px] sm:text-[9px]`}
           >
             {isPlaying ? (
               <>
@@ -679,7 +742,7 @@ export const CRTTelevision: React.FC<CRTTelevisionProps> = ({
             value={currentTime}
             onChange={handleSeek}
             aria-label="Seek video playback"
-            className="w-full h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-[#A67C37]"
+            className={`w-full h-1 bg-black/40 rounded-lg appearance-none cursor-pointer ${isCream ? 'accent-[#A67C37]' : 'accent-zinc-300'}`}
           />
         </div>
 
@@ -697,7 +760,7 @@ export const CRTTelevision: React.FC<CRTTelevisionProps> = ({
               setTimeout(() => setIsFlickering(false), 300);
             }}
             title="Cycle VHF channel"
-            className="px-1.5 py-0.5 rounded bg-black/30 hover:bg-black/50 border border-white/10 text-[#D4AF37] hover:text-white text-[7px] sm:text-[8px] font-mono tracking-wider transition-colors"
+            className={`px-1.5 py-0.5 rounded bg-black/30 hover:bg-black/50 border border-white/10 ${isCream ? 'text-[#D4AF37]' : 'text-zinc-200'} hover:text-white text-[7px] sm:text-[8px] font-mono tracking-wider transition-colors`}
           >
             CH {channelTuning}
           </button>
@@ -708,7 +771,9 @@ export const CRTTelevision: React.FC<CRTTelevisionProps> = ({
             title="Toggle CRT Scanlines"
             className={`px-1.5 py-0.5 rounded flex items-center gap-1 transition-colors text-[7px] sm:text-[8px] ${
               scanlinesEnabled
-                ? 'bg-[#A67C37]/25 text-[#DFBA73] border border-[#A67C37]/40'
+                ? isCream
+                  ? 'bg-[#A67C37]/25 text-[#DFBA73] border border-[#A67C37]/40'
+                  : 'bg-white/20 text-white border border-white/30'
                 : 'bg-black/30 text-white/50 hover:text-white border border-transparent'
             }`}
           >
@@ -788,30 +853,30 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
         />
 
         {/* Opening Editorial Label: WEDDING FILM 01 */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#121110]/15 pb-4 mb-10 sm:mb-14">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/20 pb-4 mb-10 sm:mb-14">
           <div className="flex items-center gap-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#9E7B35] animate-pulse" />
-            <span className="text-[11px] sm:text-[12px] font-mono tracking-[0.28em] uppercase font-bold text-[#9E7B35]">
+            <span className="w-2.5 h-2.5 rounded-full bg-black" />
+            <span className="text-[11px] sm:text-[12px] font-mono tracking-[0.28em] uppercase font-bold text-black">
               WEDDING FILM 01
             </span>
-            <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.22em] text-[#121110]/40 uppercase hidden xs:inline">
+            <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.22em] text-black/50 uppercase hidden xs:inline">
               // CEREMONY HIGHLIGHTS
             </span>
           </div>
 
-          <div className="text-[10px] sm:text-[11px] font-mono tracking-[0.24em] text-[#121110]/50 uppercase">
+          <div className="text-[10px] sm:text-[11px] font-mono tracking-[0.24em] text-black/60 uppercase">
             90S FILM ARCHIVES · REAL WEDDING STORIES
           </div>
         </div>
 
         {/* Dramatic Oversized Editorial Headline */}
         <div className="max-w-5xl mb-10 sm:mb-14 md:mb-20">
-          <h2 className="font-editorial text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl tracking-tight leading-[0.92] text-[#121110]">
+          <h2 className="font-editorial text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl tracking-tight leading-[0.92] text-black">
             MEMORIES,
             <br />
             <span className="italic font-light">STILL IN MOTION.</span>
           </h2>
-          <p className="mt-4 sm:mt-6 text-lg sm:text-xl md:text-2xl font-editorial italic text-[#121110]/75 tracking-wide max-w-2xl">
+          <p className="mt-4 sm:mt-6 text-lg sm:text-xl md:text-2xl font-editorial italic text-black/80 tracking-wide max-w-2xl">
             Some moments always find their way back.
           </p>
         </div>
@@ -830,17 +895,17 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
 
           {/* Editorial Metadata Card for Television 01 */}
           <div className="lg:col-span-4 flex flex-col space-y-6 pt-2 lg:pt-6">
-            <div className="space-y-4 border-l-2 border-[#9E7B35] pl-5 sm:pl-6">
-              <div className="flex items-center gap-2 text-[10px] font-mono tracking-[0.26em] uppercase text-[#9E7B35]">
-                <Film className="w-3.5 h-3.5" />
+            <div className="space-y-4 border-l-2 border-black pl-5 sm:pl-6">
+              <div className="flex items-center gap-2 text-[10px] font-mono tracking-[0.26em] uppercase text-black font-semibold">
+                <Film className="w-3.5 h-3.5 text-black" />
                 <span>{reel01.code}</span>
               </div>
 
-              <h3 className="font-editorial text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight">
+              <h3 className="font-editorial text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight text-black">
                 {reel01.title}
               </h3>
 
-              <p className="text-xs sm:text-sm font-mono tracking-[0.16em] text-[#121110]/60 uppercase">
+              <p className="text-xs sm:text-sm font-mono tracking-[0.16em] text-black/60 uppercase">
                 {reel01.location} · {reel01.year}
               </p>
             </div>
@@ -922,18 +987,18 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
           Matches: “SOME DAY, THEY'LL BE THE MEMORIES.” with Ashley & Simon
           ========================================================================= */}
       <div className="relative w-full max-w-[1400px] mx-auto px-4 xs:px-6 sm:px-8 md:px-12 lg:px-16 py-20 sm:py-28 md:py-32">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#121110]/15 pb-4 mb-12 sm:mb-16">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-black/20 pb-4 mb-12 sm:mb-16">
           <div className="flex items-center gap-3">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#121110]" />
-            <span className="text-[11px] sm:text-[12px] font-mono tracking-[0.28em] uppercase font-bold text-[#121110]">
+            <span className="w-2.5 h-2.5 rounded-full bg-black" />
+            <span className="text-[11px] sm:text-[12px] font-mono tracking-[0.28em] uppercase font-bold text-black">
               WEDDING FILM 03
             </span>
-            <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.22em] text-[#121110]/50 uppercase hidden xs:inline">
+            <span className="text-[10px] sm:text-[11px] font-mono tracking-[0.22em] text-black/50 uppercase hidden xs:inline">
               // CINEMATIC LOVE STORY
             </span>
           </div>
 
-          <div className="text-[10px] sm:text-[11px] font-mono tracking-[0.24em] text-[#121110]/50 uppercase">
+          <div className="text-[10px] sm:text-[11px] font-mono tracking-[0.24em] text-black/60 uppercase">
             LONDON PROPOSAL · TIMELESS MEMORIES
           </div>
         </div>
@@ -949,17 +1014,17 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
             />
 
             {/* Editorial Metadata Card for Television 03 */}
-            <div className="space-y-4 border-l-2 border-[#9E7B35] pl-5 sm:pl-6">
-              <div className="flex items-center gap-2 text-[10px] font-mono tracking-[0.26em] uppercase text-[#9E7B35]">
-                <Film className="w-3.5 h-3.5" />
+            <div className="space-y-4 border-l-2 border-black pl-5 sm:pl-6">
+              <div className="flex items-center gap-2 text-[10px] font-mono tracking-[0.26em] uppercase text-black font-semibold">
+                <Film className="w-3.5 h-3.5 text-black" />
                 <span>{reel03.code}</span>
               </div>
 
-              <h3 className="font-editorial text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight text-[#121110]">
+              <h3 className="font-editorial text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight text-black">
                 {reel03.title}
               </h3>
 
-              <p className="text-xs sm:text-sm font-mono tracking-[0.16em] text-[#121110]/60 uppercase">
+              <p className="text-xs sm:text-sm font-mono tracking-[0.16em] text-black/60 uppercase">
                 {reel03.location} · {reel03.year}
               </p>
             </div>
@@ -967,11 +1032,11 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
 
           {/* Typography Column: “SOME DAY, THEY'LL BE THE MEMORIES.” */}
           <div className="lg:col-span-5 order-1 lg:order-2 space-y-6">
-            <span className="inline-block px-2.5 py-1 rounded bg-[#121110]/10 text-[#121110] text-[10px] font-mono tracking-[0.24em] uppercase font-semibold">
+            <span className="inline-block px-2.5 py-1 rounded bg-black/10 border border-black/20 text-black text-[10px] font-mono tracking-[0.24em] uppercase font-semibold">
               FEATURED WEDDING FILM
             </span>
 
-            <h2 className="font-editorial text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[0.94] text-[#121110]">
+            <h2 className="font-editorial text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[0.94] text-black">
               SOME DAY,
               <br />
               <span className="italic font-light">THEY’LL BE</span>
@@ -979,7 +1044,7 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
               THE MEMORIES.
             </h2>
 
-            <p className="font-editorial italic text-base sm:text-lg md:text-xl text-[#121110]/80 leading-relaxed">
+            <p className="font-editorial italic text-base sm:text-lg md:text-xl text-black/80 leading-relaxed">
               &ldquo;{reel03.quote}&rdquo;
             </p>
           </div>

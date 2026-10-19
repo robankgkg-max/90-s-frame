@@ -28,7 +28,7 @@ export const GALLERY_ITEMS: GalleryItem[] = [
     subtitle: 'Golden hour maritime proposal framed by white florals on the Arabian Gulf',
     location: 'Dubai Marina & Arabian Gulf',
     filmStock: 'Medium Format Digital Cinema',
-    objectPosition: 'center 0%',
+    objectPosition: 'center 17%',
   },
   {
     id: 'cluster1-skyline-bride',
