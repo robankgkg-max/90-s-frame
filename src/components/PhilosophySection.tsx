@@ -98,7 +98,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onOpenInqu
             1. TOP HEADER: OUR PHILOSOPHY & SUBTITLE
         ========================================================================= */}
         <div className="w-full text-center mb-10 sm:mb-14 md:mb-16">
-          <h3 className="font-editorial text-2xl sm:text-3xl md:text-4xl lg:text-[42px] font-normal tracking-[0.24em] text-[#080808] uppercase mb-3 sm:mb-4">
+          <h3 className="font-vogue text-2xl sm:text-3xl md:text-4xl lg:text-[42px] font-normal tracking-[0.22em] text-[#080808] uppercase mb-3 sm:mb-4">
             OUR PHILOSOPHY
           </h3>
           <p className="font-editorial italic font-normal text-base sm:text-lg md:text-xl lg:text-[22px] tracking-[0.015em] text-[#080808]/75 max-w-xl mx-auto">
@@ -232,7 +232,7 @@ export const PhilosophySection: React.FC<PhilosophySectionProps> = ({ onOpenInqu
             3. HEADING: THE DAY MOVES FASTER THAN YOU THINK
         ========================================================================= */}
         <div className="w-full text-center mb-10 sm:mb-14 md:mb-16 max-w-4xl">
-          <h2 className="font-editorial text-3xl sm:text-4xl md:text-5xl lg:text-[56px] xl:text-[62px] font-normal leading-[1.08] tracking-[-0.02em] text-[#080808]">
+          <h2 className="font-vogue text-3xl sm:text-4xl md:text-5xl lg:text-[56px] xl:text-[64px] font-normal leading-[1.08] tracking-[-0.01em] text-[#080808]">
             THE DAY MOVES FASTER THAN YOU THINK
           </h2>
         </div>

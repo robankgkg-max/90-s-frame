@@ -871,7 +871,7 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
 
         {/* Dramatic Oversized Editorial Headline */}
         <div className="max-w-5xl mb-10 sm:mb-14 md:mb-20">
-          <h2 className="font-editorial text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl tracking-tight leading-[0.92] text-black">
+          <h2 className="font-vogue text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl tracking-tight leading-[0.92] text-black">
             MEMORIES,
             <br />
             <span className="italic font-light">STILL IN MOTION.</span>
@@ -901,7 +901,7 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
                 <span>{reel01.code}</span>
               </div>
 
-              <h3 className="font-editorial text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight text-black">
+              <h3 className="font-vogue text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight text-black">
                 {reel01.title}
               </h3>
 
@@ -942,7 +942,7 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
                 FEATURED WEDDING FILM
               </span>
 
-              <h2 className="font-editorial text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[0.94] text-white">
+              <h2 className="font-vogue text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[0.94] text-white">
                 BACK TO <span className="italic font-light text-[#E8DCC4]">THE WAY</span>
                 <br />
                 IT FELT.
@@ -969,7 +969,7 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
                   <span>{reel02.code}</span>
                 </div>
 
-                <h3 className="font-editorial text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight text-white">
+                <h3 className="font-vogue text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight text-white">
                   {reel02.title}
                 </h3>
 
@@ -1020,7 +1020,7 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
                 <span>{reel03.code}</span>
               </div>
 
-              <h3 className="font-editorial text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight text-black">
+              <h3 className="font-vogue text-2xl sm:text-3xl md:text-4xl tracking-tight leading-tight text-black">
                 {reel03.title}
               </h3>
 
@@ -1036,10 +1036,8 @@ export const LostSignalVideoSection: React.FC<LostSignalVideoSectionProps> = ({
               FEATURED WEDDING FILM
             </span>
 
-            <h2 className="font-editorial text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[0.94] text-black">
-              SOME DAY,
-              <br />
-              <span className="italic font-light">THEY’LL BE</span>
+            <h2 className="font-vogue text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-tight leading-[0.94] text-black">
+              SOME DAY, <span className="italic font-light">THEY'LL BE</span>
               <br />
               THE MEMORIES.
             </h2>

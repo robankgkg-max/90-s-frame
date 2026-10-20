@@ -134,7 +134,7 @@ export const GalleryArchiveSection: React.FC<GalleryArchiveSectionProps> = ({
         <div className="w-full mb-10 sm:mb-14 md:mb-20">
           {/* Editorial Display Heading */}
           <div className="text-left">
-            <h2 className="font-editorial text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.92] tracking-[-0.02em] text-[#F2EDE4]">
+            <h2 className="font-vogue text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-normal leading-[0.92] tracking-[-0.01em] text-[#F2EDE4]">
               THE ART OF
               <br />
               REMEMBERING

@@ -94,7 +94,7 @@ export const AwardsSection: React.FC<AwardsSectionProps> = () => {
             </span>
           </div>
 
-          <h2 className="font-editorial text-3xl xs:text-4xl sm:text-5xl md:text-6xl tracking-tight text-white uppercase">
+          <h2 className="font-vogue text-3xl xs:text-4xl sm:text-5xl md:text-6xl tracking-tight text-white uppercase">
             RECOGNIZED AWARDS
           </h2>
 
